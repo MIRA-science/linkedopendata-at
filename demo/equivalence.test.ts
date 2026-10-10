@@ -10,7 +10,7 @@ import { normalize } from "../normalizer/src/index.ts";
 // Own ports, so a broker started by hand (npm run broker) does not answer instead.
 process.env.LOD_BASE = "http://127.0.0.1:18080";
 process.env.BROKER = "http://127.0.0.1:18081";
-const { config } = await import("./config.ts");
+const { config } = await import("../broker/config.ts");
 
 const { pds, did, lodBase } = config;
 const records = [

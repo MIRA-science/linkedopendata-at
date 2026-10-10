@@ -35,7 +35,26 @@ Tests read the MIRA context from `../schema/atproto/context.jsonld` (override wi
 
 ## Demo
 
-Needs a local PDS (millipds) with an account; see `demo/config.ts`. Environment variables: `HOST` (hostname of ‹lod-base› and the broker, default `127.0.0.1`), `PDS_HOST` (default `127.0.0.1`), `LISTEN` (address the servers listen on, default `HOST`; e.g. `0.0.0.0`), and, to override whole URLs, `LOD_BASE`, `BROKER`, `PDS`; also `DEMO_DID`, `DEMO_PASSWORD`. `HTTP_HOSTS`: the sources of the HTTP broker (below). For the write path: `MIRA_SHAPES`, `MIRA_ONTOLOGY`, `MIRA_BINDING` (default: `mira.shacl`, `mira.ttl` and `atproto/` in `../schema`), and `CONTEXT_HOSTS` (default `purl.org`).
+Needs a local PDS (millipds) with an account. Configuration is in `broker/config.ts`, from the environment.
+
+Broker:
+
+| Variable | Default | |
+| --- | --- | --- |
+| `PDS` | `http://127.0.0.1:8123` | Full URL of the PDS of every account served (e.g. `https://devpds.example.org`) |
+| `HOST` | `127.0.0.1` | Hostname in the default `LOD_BASE` and `BROKER`, and in `LISTEN` |
+| `LOD_BASE` | `http://‹HOST›:8080` | ‹lod-base›: the redirector, and the base of every IRI |
+| `BROKER` | `http://‹HOST›:8081` | Canonical broker endpoint |
+| `LISTEN` | `HOST` | Address both servers listen on (e.g. `0.0.0.0`) |
+| `LINKS` | `absolute` | `relative`: behind one reverse-proxy origin (below) |
+| `CONTEXT_DID` | `DEMO_DID` | Account holding the `science.mira` context record |
+| `HTTP_HOSTS` | the Discourse Graphs `mira-collab` preview | Sources of the HTTP broker (below) |
+| `CONTEXT_HOSTS` | `purl.org` | Hosts remote contexts of posted JSON-LD may come from (besides `HTTP_HOSTS`) |
+| `MIRA_CONTEXT` | `../schema/atproto/context.jsonld` | The generated MIRA context |
+| `MIRA_BINDING` | `../schema/atproto/` | The generated binding: lexicons, binding and pinning shapes |
+| `MIRA_SHAPES`, `MIRA_ONTOLOGY` | `../schema/mira.shacl`, `../schema/mira.ttl` | For the write path |
+
+Demo (seed and tests): `DEMO_DID` (default `did:web:mira-demo.local`) and `DEMO_PASSWORD` (default `mira`). The seed writes the context record to the demo account.
 
 ```sh
 npm install

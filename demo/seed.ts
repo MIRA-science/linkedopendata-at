@@ -1,7 +1,7 @@
 // Writes sample MIRA records and the science.mira context record to a local PDS.
 // Idempotent: fixed record keys, putRecord. Usage: node demo/seed.ts
 import { readFileSync } from "node:fs";
-import { config } from "./config.ts";
+import { config } from "../broker/config.ts";
 
 const { pds, did, password, contextPath } = config;
 

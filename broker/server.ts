@@ -1,8 +1,8 @@
 // Minimal canonical broker (§6.2–6.4), plus the redirector behind ‹lod-base› (§6.3).
 // Two brokers share one endpoint: ATProto records, and JSON-LD from the Web under /http/.
-// Usage: node broker/server.ts   (configuration in demo/config.ts)
+// Usage: node broker/server.ts   (configuration in broker/config.ts)
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { config } from "../demo/config.ts";
+import { config } from "./config.ts";
 import { send, type Links } from "./base.ts";
 import { AtprotoBroker, authorityOf, hosted } from "./atproto.ts";
 import { HttpBroker, HTTP_PREFIX } from "./http.ts";

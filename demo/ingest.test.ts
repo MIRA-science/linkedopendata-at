@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { createServer, type Server } from "node:http";
 import { spawn, type ChildProcess } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { config } from "./config.ts";
+import { config } from "../broker/config.ts";
 
 const CONTEXTS = "http://127.0.0.1:48090";
 const BROKER = "http://127.0.0.1:48081";

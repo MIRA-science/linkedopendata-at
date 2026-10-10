@@ -23,7 +23,7 @@ import SHACLValidator from "rdf-validate-shacl";
 import { Lexicons } from "@atproto/lexicon";
 import { Parser as HtmlParser } from "htmlparser2";
 import { normalize, RICHTEXT } from "../normalizer/src/index.ts";
-import { config } from "../demo/config.ts";
+import { config } from "./config.ts";
 import { send, XSD, DCT_DESCRIPTION, DCT_FORMAT, SIOC_CONTENT, type Expanded, type Loaded, type Node } from "./base.ts";
 import type { AtprotoBroker } from "./atproto.ts";
 

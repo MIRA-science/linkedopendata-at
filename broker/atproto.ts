@@ -2,12 +2,12 @@
 import { readFileSync } from "node:fs";
 import { normalize, entityIri, lodPath, RICHTEXT, type AtRecord } from "../normalizer/src/index.ts";
 import { renderRichText, type Facet } from "../normalizer/src/richtext.ts";
-import { config } from "../demo/config.ts";
+import { config } from "./config.ts";
 import { Broker, esc, SIOC_CONTENT, type Doc, type Links, type Loaded, type Node, type Result, type TextContext } from "./base.ts";
 
 // NSID prefixes this broker serves, with the repo holding their context record (§4.1).
 // Stands in for _lexicon.‹authority› DNS resolution.
-const authorities: Record<string, { did: string }> = { "science.mira": { did: config.did } };
+const authorities: Record<string, { did: string }> = { "science.mira": { did: config.contextDid } };
 // Stands in for DID resolution: every account of the sandbox is on one PDS.
 export const pdsOf = (_did: string) => config.pds;
 const hostedRepos = new Set<string>();

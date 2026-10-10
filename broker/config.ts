@@ -1,14 +1,19 @@
-// Demo configuration. Stands in for DID resolution and _lexicon discovery (§4.1, §6.2).
+// Broker configuration, from the environment. Stands in for DID resolution and _lexicon
+// discovery (§4.1, §6.2). The demo (seed, tests) reads it too.
 const root = new URL("../", import.meta.url);
 
-// Hostname in the default URLs of ‹lod-base› and the broker; PDS_HOST for the PDS.
-// LOD_BASE, BROKER and PDS override the whole URL.
+// Hostname in the default URLs of ‹lod-base› and the broker; LOD_BASE and BROKER override
+// the whole URL.
 const host = process.env.HOST ?? "127.0.0.1";
-const pdsHost = process.env.PDS_HOST ?? "127.0.0.1";
+// The demo account: seeded by demo/seed.ts, written by the tests.
+const did = process.env.DEMO_DID ?? "did:web:mira-demo.local";
 
 export const config = {
-  pds: process.env.PDS ?? `http://${pdsHost}:8123`,
-  did: process.env.DEMO_DID ?? "did:web:mira-demo.local",
+  // The PDS of every account the broker serves (full URL).
+  pds: process.env.PDS ?? "http://127.0.0.1:8123",
+  // The account holding the science.mira context record (§4.1).
+  contextDid: process.env.CONTEXT_DID ?? did,
+  did,
   password: process.env.DEMO_PASSWORD ?? "mira",
   contextPath: process.env.MIRA_CONTEXT ?? new URL("../schema/atproto/context.jsonld", root).pathname,
   // Write path (broker/ingest.ts): the MIRA shapes and ontology, and the directory of the
