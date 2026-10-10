@@ -1,9 +1,10 @@
-// Writes sample MIRA records and the science.mira context record to a local PDS.
+// Writes the science.mira lexicons and context record, and sample MIRA records, to a PDS.
 // Idempotent: fixed record keys, putRecord. Usage: node demo/seed.ts
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { config } from "../broker/config.ts";
 
-const { pds, did, password, contextPath } = config;
+const { pds, did, password, contextPath, bindingDir } = config;
 
 async function xrpc(method: string, body?: object, token?: string) {
   const res = await fetch(`${pds}/xrpc/${method}`, {
@@ -21,6 +22,15 @@ async function put(collection: string, rkey: string, record: object): Promise<{ 
   const r = await xrpc("com.atproto.repo.putRecord", { repo: did, collection, rkey, record: { $type: collection, ...record } }, accessJwt);
   console.log(`${r.uri}  ${r.cid}`);
   return r;
+}
+
+// The lexicons, as lexicon resolution expects them: one com.atproto.lexicon.schema record
+// per NSID, keyed by the NSID, in the authority's repo. The broker validates against the
+// files, not these records; both come from the same generator output.
+const lexiconDir = join(bindingDir, "lexicons", "science", "mira");
+for (const f of readdirSync(lexiconDir).filter((f) => f.endsWith(".json"))) {
+  const lexicon = JSON.parse(readFileSync(join(lexiconDir, f), "utf8"));
+  await put("com.atproto.lexicon.schema", lexicon.id, lexicon);
 }
 
 // The context record (§4.1). ATProto records cannot hold floats, so "@version": 1.1 is

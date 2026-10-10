@@ -54,11 +54,11 @@ Broker:
 | `MIRA_BINDING` | `../schema/atproto/` | The generated binding: lexicons, binding and pinning shapes |
 | `MIRA_SHAPES`, `MIRA_ONTOLOGY` | `../schema/mira.shacl`, `../schema/mira.ttl` | For the write path |
 
-Demo (seed and tests): `DEMO_DID` (default `did:web:mira-demo.local`) and `DEMO_PASSWORD` (default `mira`). The seed writes the context record to the demo account.
+Demo (seed and tests): `DEMO_DID` (default `did:web:mira-demo.local`) and `DEMO_PASSWORD` (default `mira`). The seed writes the lexicons (`com.atproto.lexicon.schema` records keyed by NSID, from `MIRA_BINDING`) and the context record to the demo account; the broker reads only the context record, and validates against the lexicon files.
 
 ```sh
 npm install
-npm run seed     # sample MIRA records + the science.mira context record
+npm run seed     # the science.mira lexicons and context record, sample MIRA records
 npm run broker   # ‹lod-base› on :8080 (303 redirects), broker on :8081
 npm test         # normalizer tests + equivalence tests (starts its own broker)
 ```
