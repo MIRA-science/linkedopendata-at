@@ -46,6 +46,7 @@ Broker:
 | `LOD_BASE` | `http://‹HOST›:8080` | ‹lod-base›: the redirector, and the base of every IRI |
 | `BROKER` | `http://‹HOST›:8081` | Canonical broker endpoint |
 | `LISTEN` | `HOST` | Address both servers listen on (e.g. `0.0.0.0`) |
+| `PORT`, `LOD_PORT` | the ports of `BROKER` and `LOD_BASE`, else `8081` and `8080` | Ports the broker and the redirector listen on |
 | `LINKS` | `absolute` | `relative`: behind one reverse-proxy origin (below) |
 | `CONTEXT_DID` | `DEMO_DID` | Account holding the `science.mira` context record |
 | `HTTP_HOSTS` | the Discourse Graphs `mira-collab` preview | Sources of the HTTP broker (below) |

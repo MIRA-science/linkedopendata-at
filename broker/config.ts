@@ -8,6 +8,8 @@ const host = process.env.HOST ?? "127.0.0.1";
 // The demo account: seeded by demo/seed.ts, written by the tests.
 const did = process.env.DEMO_DID ?? "did:web:mira-demo.local";
 
+const portOf = (url?: string) => (url ? Number(new URL(url).port) : 0);
+
 export const config = {
   // The PDS of every account the broker serves (full URL).
   pds: process.env.PDS ?? "http://127.0.0.1:8123",
@@ -26,8 +28,12 @@ export const config = {
   // ‹lod-base› (the redirector) and the canonical broker endpoint.
   lodBase: process.env.LOD_BASE ?? `http://${host}:8080`,
   endpoint: process.env.BROKER ?? `http://${host}:8081`,
-  // Address the servers listen on (e.g. 0.0.0.0 for all interfaces).
+  // Address the servers listen on (e.g. 0.0.0.0 for all interfaces), and their ports: by
+  // default the ports of BROKER and LOD_BASE, or 8081 and 8080 when those are public URLs
+  // without one (behind a proxy).
   listen: process.env.LISTEN ?? host,
+  port: Number(process.env.PORT ?? (portOf(process.env.BROKER) || 8081)),
+  lodPort: Number(process.env.LOD_PORT ?? (portOf(process.env.LOD_BASE) || 8080)),
   // "relative": links and broker URLs without scheme and host, for a reverse proxy that
   // serves ‹lod-base› and the broker on one public origin. IRIs stay absolute.
   links: process.env.LINKS === "relative" ? "relative" : "absolute",

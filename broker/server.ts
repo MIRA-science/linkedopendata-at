@@ -51,10 +51,9 @@ async function redirector(req: IncomingMessage, res: ServerResponse) {
   res.end();
 }
 
-const port = (u: string) => Number(new URL(u).port);
-createServer(broker).listen(port(endpoint), config.listen, () => console.log(`broker      ${endpoint}`));
+createServer(broker).listen(config.port, config.listen, () => console.log(`broker      ${endpoint} (port ${config.port})`));
 // In relative mode, ‹lod-base› and the broker share one origin (behind a proxy): the broker
 // answers ‹lod-base› paths itself, and a separate redirector would only redirect to itself.
 if (links.relative) console.log(`‹lod-base›  ${lodBase} (served by the broker, through the proxy)`);
-else createServer(redirector).listen(port(lodBase), config.listen, () => console.log(`‹lod-base›  ${lodBase}`));
+else createServer(redirector).listen(config.lodPort, config.listen, () => console.log(`‹lod-base›  ${lodBase} (port ${config.lodPort})`));
 for (const h of config.httpHosts) console.log(`http source ${endpoint}${HTTP_PREFIX}${h}/…`);
