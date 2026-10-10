@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "at.linkedopendata.richtext",
+  "description": "Rich text for Linked Data records: plain text plus facets (proposal §3 rule 7). DRAFT.",
+  "defs": {
+    "text": {
+      "type": "object",
+      "description": "An inline text item (sioc:Item). The plain text maps to sioc:content; facets are presentation only. In the Linked Data view, the item is named ‹record›#‹field› (proposal §6.5).",
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string", "maxLength": 100000 },
+        "facets": {
+          "type": "array",
+          "description": "Annotations on byte ranges of the text. Besides the Bluesky features (link, mention, tag), at.linkedopendata.richtext#property marks a span that restates a field of the record.",
+          "items": { "type": "ref", "ref": "app.bsky.richtext.facet" }
+        }
+      }
+    },
+    "property": {
+      "type": "object",
+      "description": "Facet feature: the span restates a statement the record already makes (mirror rule, proposal §3 rule 7). The statement is (the record, property, ref) or, without ref, (the record, property, the span's text). Clients may ignore it; brokers render it as RDFa, and only when the record does make that statement.",
+      "required": ["property"],
+      "properties": {
+        "property": { "type": "string", "format": "uri", "description": "IRI of the RDF property." },
+        "ref": { "type": "ref", "ref": "at.linkedopendata.defs#ref", "description": "The object of the statement, as in the record (pinned or not)." }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+[global]
+
+# One line per paragraph: no maximum line length, and wrapped lines are joined.
+[MD013]
+line-length = 0
+reflow = true
+reflow-mode = "normalize"
+
+[MD029]
+style = "ordered"

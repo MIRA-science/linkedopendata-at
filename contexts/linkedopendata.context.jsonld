@@ -1,0 +1,29 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "atp": "https://linkedopendata.at/ns/atp#",
+    "dct": "http://purl.org/dc/terms/",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "sioc": "http://rdfs.org/sioc/ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "owl:sameAs": { "@type": "@id" },
+    "dct:isVersionOf": { "@type": "@id" },
+    "sioc:has_creator": { "@type": "@id" },
+    "sioc:has_container": { "@type": "@id" },
+    "sioc:has_space": { "@type": "@id" },
+    "sioc:has_owner": { "@type": "@id" },
+    "sioc:container_of": { "@type": "@id" },
+    "sioc:owner_of": { "@type": "@id" },
+    "rdfs:seeAlso": { "@type": "@id" },
+    "atp:appliedContext": { "@type": "@id" },
+    "sioc:link": { "@type": "@id" },
+    "sioc:previous_version": { "@type": "@id" },
+    "sioc:latest_version": { "@type": "@id" },
+    "foaf:primaryTopic": { "@type": "@id" },
+    "prov:wasDerivedFrom": { "@type": "@id" },
+    "dct:modified": { "@type": "xsd:dateTime" }
+  }
+}

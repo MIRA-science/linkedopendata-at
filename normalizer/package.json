@@ -1,0 +1,10 @@
+{
+  "name": "@linkedopendata-at/normalizer",
+  "version": "0.0.1",
+  "description": "Proof of concept: ATProto record -> Linked Data view (proposal §6.5, §6.7)",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": { "test": "node --test \"test/**/*.test.ts\"" },
+  "dependencies": { "jsonld": "^8.3.3" },
+  "license": "Apache-2.0"
+}

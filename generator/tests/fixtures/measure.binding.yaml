@@ -1,0 +1,7 @@
+schema: measure.yaml
+nsid_prefix: org.example
+ref_def: at.linkedopendata.defs#ref
+records: [Measurement]
+fields:
+  notes:
+    union: [at.linkedopendata.richtext#text, at.linkedopendata.defs#ref]

@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "at.linkedopendata.defs",
+  "description": "Shared definitions for Linked Data lexicons (proposal §3). DRAFT.",
+  "defs": {
+    "ref": {
+      "type": "object",
+      "description": "A reference to another resource. Pinned when 'cid' is present (proposal §6.7); compatible with com.atproto.repo.strongRef.",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri",
+          "description": "An at:// URI, or any other URI for references across transports."
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid",
+          "description": "CID of the pinned version of the target: the record's CID for an at:// URI; otherwise the CID of the target's bytes (raw codec, sha-256), as for blobs."
+        }
+      }
+    },
+    "decimal": {
+      "type": "string",
+      "maxLength": 64,
+      "description": "Lexical form of an xsd:decimal, e.g. '-0.42'. Non-integer numbers are strings, since the ATProto data model has no floats (proposal §3 rule 10)."
+    },
+    "double": {
+      "type": "string",
+      "maxLength": 64,
+      "description": "Lexical form of an xsd:double, e.g. '1.5E3', 'INF', 'NaN' (proposal §3 rule 10)."
+    }
+  }
+}

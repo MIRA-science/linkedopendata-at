@@ -1,0 +1,25 @@
+{
+  "lexicon": 1,
+  "id": "at.linkedopendata.lexicon.context",
+  "description": "JSON-LD context for an NSID prefix, published by its authority or as an overlay (proposal §4). DRAFT.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record key: the NSID prefix covered, e.g. 'science.mira'.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": ["context"],
+        "properties": {
+          "context": { "type": "unknown", "description": "The JSON-LD context object (the value of @context)." },
+          "lexicons": {
+            "type": "array",
+            "description": "Lexicon revisions the context was generated from.",
+            "items": { "type": "ref", "ref": "at.linkedopendata.defs#ref" }
+          },
+          "createdAt": { "type": "string", "format": "datetime" }
+        }
+      }
+    }
+  }
+}
