@@ -28,6 +28,34 @@ export const SIOC_CONTENT = "http://rdfs.org/sioc/ns#content";
 
 export const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
+/**
+ * Remote contexts, kept for ttl milliseconds: a source that corrects its context is read
+ * again without a restart. A failed fetch is not kept.
+ */
+export class ContextCache {
+  ttl: number;
+  entries = new Map<string, { at: number; document: Promise<unknown> }>();
+
+  constructor(ttl = 300_000) {
+    this.ttl = ttl;
+  }
+
+  /** The caller checks that the host is allowed. */
+  async load(url: string): Promise<Loaded> {
+    let entry = this.entries.get(url);
+    if (!entry || Date.now() - entry.at >= this.ttl) {
+      const document = fetch(url, { headers: { accept: "application/ld+json, application/json" } }).then((r) => {
+        if (!r.ok) throw new Error(`${r.status} for context ${url}`);
+        return r.json();
+      });
+      entry = { at: Date.now(), document };
+      this.entries.set(url, entry);
+      document.catch(() => this.entries.get(url) === entry && this.entries.delete(url));
+    }
+    return { contextUrl: null, documentUrl: url, document: await entry.document };
+  }
+}
+
 // Shown only in the full view: identity and structure, which the JSON-LD carries anyway.
 const PLUMBING = new Set([
   "http://www.w3.org/2002/07/owl#sameAs",

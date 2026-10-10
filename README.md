@@ -52,6 +52,7 @@ Broker:
 | `CONTEXT_DID` | `DEMO_DID` | Account holding the `science.mira` context record |
 | `HTTP_HOSTS` | the Discourse Graphs `mira-collab` preview | Sources of the HTTP broker (below) |
 | `CONTEXT_HOSTS` | `purl.org` | Hosts remote contexts of posted JSON-LD may come from (besides `HTTP_HOSTS`) |
+| `CONTEXT_TTL` | `300` | Seconds a remote context is kept before it is fetched again |
 | `MIRA_CONTEXT` | `../schema/atproto/context.jsonld` | The generated MIRA context |
 | `MIRA_BINDING` | `../schema/atproto/` | The generated binding: lexicons, binding and pinning shapes |
 | `MIRA_SHAPES`, `MIRA_ONTOLOGY` | `../schema/mira.shacl`, `../schema/mira.ttl` | For the write path |

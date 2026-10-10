@@ -25,6 +25,8 @@ export const config = {
   bindingDir: process.env.MIRA_BINDING ?? new URL("../schema/atproto/", root).pathname,
   // Hosts remote contexts of submitted JSON-LD may come from (besides HTTP_HOSTS).
   contextHosts: (process.env.CONTEXT_HOSTS ?? "purl.org").split(",").filter(Boolean),
+  // How long a remote context is kept, in seconds.
+  contextTtl: Number(process.env.CONTEXT_TTL ?? 300) * 1000,
   // ‹lod-base› (the redirector) and the canonical broker endpoint.
   lodBase: process.env.LOD_BASE ?? `http://${host}:8080`,
   endpoint: process.env.BROKER ?? `http://${host}:8081`,

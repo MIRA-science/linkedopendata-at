@@ -24,7 +24,7 @@ import { Lexicons } from "@atproto/lexicon";
 import { Parser as HtmlParser } from "htmlparser2";
 import { normalize, RICHTEXT } from "../normalizer/src/index.ts";
 import { config } from "./config.ts";
-import { send, XSD, DCT_DESCRIPTION, DCT_FORMAT, SIOC_CONTENT, type Expanded, type Loaded, type Node } from "./base.ts";
+import { send, ContextCache, XSD, DCT_DESCRIPTION, DCT_FORMAT, SIOC_CONTENT, type Expanded, type Loaded, type Node } from "./base.ts";
 import type { AtprotoBroker } from "./atproto.ts";
 
 const SH = "http://www.w3.org/ns/shacl#";
@@ -232,7 +232,7 @@ export class Ingest {
   shapes: { mira: any; binding: any; pinning: any };
   ontology: any;
   lexicons: Lexicons;
-  remote = new Map<string, Promise<unknown>>();
+  remote = new ContextCache(config.contextTtl);
   allowedHosts: string[];
 
   constructor(atproto: AtprotoBroker) {
@@ -260,16 +260,7 @@ export class Ingest {
     } catch {
       const host = URL.parse(url)?.host;
       if (!host || !this.allowedHosts.includes(host)) throw new Error(`context from a host that is not allowed: ${url}`);
-      if (!this.remote.has(url)) {
-        this.remote.set(
-          url,
-          fetch(url, { headers: { accept: "application/ld+json, application/json" } }).then((r) => {
-            if (!r.ok) throw new Error(`${r.status} for context ${url}`);
-            return r.json();
-          }),
-        );
-      }
-      return { contextUrl: null, documentUrl: url, document: await this.remote.get(url) };
+      return this.remote.load(url);
     }
   }
 

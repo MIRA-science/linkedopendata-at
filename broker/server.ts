@@ -11,7 +11,7 @@ import { Ingest } from "./ingest.ts";
 const { lodBase, endpoint } = config;
 const links: Links = { lodBase, endpoint, relative: config.links === "relative" };
 const atproto = new AtprotoBroker(links);
-const http = new HttpBroker(links, config.httpHosts);
+const http = new HttpBroker(links, config.httpHosts, config.contextTtl);
 const ingest = new Ingest(atproto);
 const WRITE_PATHS = new Set(["/validate", "/convert", "/records"]);
 

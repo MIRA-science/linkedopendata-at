@@ -2,18 +2,19 @@
 // shown through the same HTML view. https://‹host›/‹path› is served at /http/‹host›/‹path›,
 // for allowlisted hosts only (the broker is not an open proxy). The source keeps its IRIs.
 import jsonld from "jsonld";
-import { Broker, esc, DCT_TITLE, XSD, type Expanded, type Links, type Loaded, type Node, type Result } from "./base.ts";
+import { Broker, ContextCache, esc, DCT_TITLE, XSD, type Expanded, type Links, type Loaded, type Node, type Result } from "./base.ts";
 
 export const HTTP_PREFIX = "/http/";
 
 export class HttpBroker extends Broker {
   /** Origins whose documents (and contexts) this broker fetches, by host. */
   origins: Map<string, string>;
-  contexts = new Map<string, Promise<unknown>>();
+  contexts: ContextCache;
 
   /** sources: hosts (https) or origins, e.g. http://127.0.0.1:8090 for a local test. */
-  constructor(links: Links, sources: string[]) {
+  constructor(links: Links, sources: string[], contextTtl?: number) {
     super(links);
+    this.contexts = new ContextCache(contextTtl);
     this.origins = new Map(sources.map((s) => new URL(s.includes("://") ? s : `https://${s}`)).map((u) => [u.host, u.origin]));
   }
 
@@ -37,16 +38,7 @@ export class HttpBroker extends Broker {
 
   async documentLoader(url: string): Promise<Loaded> {
     if (!this.allowed(URL.parse(url))) throw new Error(`context from a host that is not allowed: ${url}`);
-    if (!this.contexts.has(url)) {
-      this.contexts.set(
-        url,
-        fetch(url, { headers: { accept: "application/ld+json, application/json" } }).then((r) => {
-          if (!r.ok) throw new Error(`${r.status} for context ${url}`);
-          return r.json();
-        }),
-      );
-    }
-    return { contextUrl: null, documentUrl: url, document: await this.contexts.get(url) };
+    return this.contexts.load(url);
   }
 
   async resolve(path: string): Promise<Result> {
