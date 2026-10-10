@@ -519,7 +519,7 @@ export class Ingest {
         const [, , collection, rkey] = /^at:\/\/([^/]+)\/([^/]+)\/([^/]+)$/.exec(c.uri)!;
         const r = await this.xrpc("com.atproto.repo.putRecord", {}, token, { repo: did, collection, rkey, record: c.record, validate: false });
         if (!r.ok) return json(502, { error: `putRecord ${c.uri}: ${r.status} ${JSON.stringify(r.json)}`, written, report });
-        written.push({ source: c.source, uri: r.json.uri, cid: r.json.cid, action: c.existing ? "update" : "create", page: this.atproto.brokerUrl(`/at/${did}/${collection}/${rkey}`) });
+        written.push({ source: c.source, uri: r.json.uri, cid: r.json.cid, action: c.existing ? "update" : "create", page: this.atproto.endpoint + `/at/${did}/${collection}/${rkey}` });
       }
       return json(200, { blocking, records: written, report });
     } catch (e) {
