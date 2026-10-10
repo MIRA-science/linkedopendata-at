@@ -12,6 +12,7 @@ A companion, postponed proposal for MIRA and Discourse Graphs JSON-LD: [literal 
 | `normalizer/` | ATProto record → Linked Data view, the Level 2 path (TypeScript)      | §6.5, §6.7 |
 | `broker/`     | Serves the Linked Data view (JSON-LD; HTML with RDFa), and the ‹lod-base› redirector. `base.ts`: the common broker (content negotiation, HTML view); `atproto.ts`: ATProto records; `http.ts`: JSON-LD already on the Web | §6.2–6.4   |
 | `demo/`       | Sample records on a local PDS, Level 0 ≡ Level 2 tests               | §7         |
+| `deploy/`     | `did_web.py`: did:web documents for the accounts of a millipds        |            |
 | `lexicons/`   | Community lexicons: `at.linkedopendata.defs`, `.lexicon.context`      | §3, §4     |
 | `contexts/`   | Community JSON-LD context (prefixes and IRI coercion for added terms) | §6.4       |
 
@@ -119,6 +120,24 @@ server {
 
 ```sh
 LINKS=relative LOD_BASE=https://lod.example.org npm run broker
+```
+
+### did:web documents for millipds accounts
+
+`deploy/did_web.py` serves `/.well-known/did.json` and `/.well-known/atproto-did` for every `did:web` account of a millipds, by `Host`, from its database (read-only): the account's public signing key, its handle, and the PDS (`pds_pfx` of the millipds config, or `--pds`). A new account needs no file: create it, and its document is served. Run it with the Python of millipds, from its directory:
+
+```sh
+.venv/bin/python path/to/deploy/did_web.py --port 8124   # --db data/millipds.sqlite3 by default
+```
+
+```nginx
+server {
+    server_name ~^testpds-\d+\.example\.org$;   # the account hosts only, not other sites
+    location /.well-known/ {
+        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:8124;
+    }
+}
 ```
 
 ## Findings for the proposal
