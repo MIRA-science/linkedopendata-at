@@ -35,7 +35,7 @@ Tests read the MIRA context from `../schema/atproto/context.jsonld` (override wi
 
 ## Demo
 
-Needs a local PDS (millipds) with an account; see `demo/config.ts`. Environment variables: `HOST` (hostname of ‹lod-base› and the broker, default `127.0.0.1`), `PDS_HOST` (default `127.0.0.1`), `LISTEN` (address the servers listen on, default `HOST`; e.g. `0.0.0.0`), and, to override whole URLs, `LOD_BASE`, `BROKER`, `PDS`; also `DEMO_DID`, `DEMO_PASSWORD`. `HTTP_HOSTS`: the sources of the HTTP broker (below).
+Needs a local PDS (millipds) with an account; see `demo/config.ts`. Environment variables: `HOST` (hostname of ‹lod-base› and the broker, default `127.0.0.1`), `PDS_HOST` (default `127.0.0.1`), `LISTEN` (address the servers listen on, default `HOST`; e.g. `0.0.0.0`), and, to override whole URLs, `LOD_BASE`, `BROKER`, `PDS`; also `DEMO_DID`, `DEMO_PASSWORD`. `HTTP_HOSTS`: the sources of the HTTP broker (below). For the write path: `MIRA_SHAPES`, `MIRA_ONTOLOGY`, `MIRA_BINDING` (default: `mira.shacl`, `mira.ttl` and `atproto/` in `../schema`), and `CONTEXT_HOSTS` (default `purl.org`).
 
 ```sh
 npm install
@@ -55,6 +55,34 @@ open http://127.0.0.1:8081/http/discourse-graph-git-mira-collab-discourse-graphs
 ```
 
 A description whose item has `dct:format "text/html"` is embedded as HTML, and the RDFa restates its literal in a `content` attribute, so that the RDFa matches the JSON-LD. This is a proof of concept: the HTML is not sanitized (§9), and the mirror rule is not applied to RDFa inside it.
+
+### From JSON-LD to records
+
+For testing MIRA generators: post their JSON-LD, get back the ATProto records it becomes, and a SHACL report.
+
+| Endpoint          | Does                                                                     |
+| ----------------- | ------------------------------------------------------------------------ |
+| `POST /validate`  | report only                                                              |
+| `POST /convert`   | records (not written) and report; `?did=` plans URIs in that repo         |
+| `POST /records`   | writes the records to the caller's repo; `Authorization: Bearer ‹accessJwt›` |
+
+```sh
+TOKEN=$(curl -s -X POST -H 'content-type: application/json' -d '{"identifier":"did:web:mira-demo.local","password":"mira"}' \
+  http://127.0.0.1:8123/xrpc/com.atproto.server.createSession | jq -r .accessJwt)
+curl -s -X POST -H "authorization: Bearer $TOKEN" --data @sampleData.json http://127.0.0.1:8081/records
+```
+
+The token is passed through to the PDS: the broker never sees a password. Every node typed with a record class becomes a record. Its IRI goes into the record's `sameAs` (`owl:sameAs`), which is how the next post of the same node finds the record and updates it (with `previousVersionCid`). References to ATProto records, by ‹lod-base› IRI or `at://` URI, are pinned to their current version; references between records of the same post are not pinned. An HTML description becomes text and facets: links become link facets, and RDFa spans become `#property` facets when the record makes the statement they restate.
+
+The report is one `sh:ValidationReport` (JSON-LD), with:
+
+- the MIRA shapes, on the input (with the class hierarchy of `mira.ttl`);
+- the binding's closed shapes (`binding.shacl.ttl`, generated), on the input: each triple the binding has no field for, as `sh:Info`;
+- the pinning shapes, on the Linked Data view of the converted records (`sh:Warning`);
+- the lexicons, on the converted records (`sh:Violation`: a gap in the generated shapes);
+- notes from the conversion (`sh:Info`), e.g. typed nodes that become no record.
+
+Only violations block a write (`blocking` counts them); `sh:conforms` is false as soon as there is any result. Remote contexts are fetched only from `CONTEXT_HOSTS` and `HTTP_HOSTS`. The broker serves every account of the PDS.
 
 ### Behind a reverse proxy
 
@@ -77,6 +105,8 @@ LINKS=relative LOD_BASE=https://lod.example.org npm run broker
 
 - RDFa: `property` + `resource` links a text item, but does not make it the subject of the content inside; only `typeof` does. An untyped item (as in the Discourse Graphs API) therefore needs `resource` again on the text element.
 - Discourse Graphs API (`mira-collab` branch): HTML is in `sioc:content`, where §6.4 item 5 expects plain text and `content:encoded` for HTML; the description text still contains the frontmatter (`nodeTypeId`, `publishedToGroups`), part of it rendered as a heading; the text item is not typed `sioc:Item`.
+- The MIRA shapes check the class of references (`sh:class`), so a reference to a node outside the submitted graph needs its type stated there. The converter adds the type of references to ATProto records (from their collection); for other IRIs, producers must type them.
+- Converting the live Discourse Graphs node (`/api/data/7478/31687`) gives two MIRA violations: its container is not typed `sioc:Container`, and its description item is not typed `sioc:Item`. Everything `sampleData.json` says is kept except `dct:creator` (the signer, in ATProto) and the relation instance, for which the binding has no record type (`science.mira.relation`).
 - ATProto records cannot hold floats, so the context record (§4.1) cannot carry `"@version": 1.1`. The PoC leaves it out and readers add it back.
 
 ## Simplifications in the PoC

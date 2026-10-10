@@ -1,4 +1,4 @@
-"""lod-at-gen BINDING OUTDIR: write lexicons/ and context.jsonld under OUTDIR."""
+"""lod-at-gen BINDING OUTDIR: write lexicons/, context.jsonld and SHACL shapes under OUTDIR."""
 
 import argparse
 import json
@@ -23,6 +23,7 @@ def main() -> None:
         write(args.outdir / "lexicons" / Path(*nsid.split(".")).with_suffix(".json"), b.lexicon(cls))
     write(args.outdir / "context.jsonld", b.context())
     (args.outdir / "pinning.shacl.ttl").write_text(b.pinning_shapes())
+    (args.outdir / "binding.shacl.ttl").write_text(b.binding_shapes())
 
 
 if __name__ == "__main__":

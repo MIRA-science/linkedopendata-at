@@ -65,3 +65,51 @@ def test_pinning_shapes_warn_on_reference_fields_only(binding):
     from rdflib import Graph
 
     assert len(Graph().parse(data=ttl, format="turtle")) > 0
+
+
+def _validate(shapes_ttl: str, data_ttl: str):
+    from pyshacl import validate
+    from rdflib import Graph
+
+    conforms, report, _ = validate(Graph().parse(data=data_ttl, format="turtle"), shacl_graph=Graph().parse(data=shapes_ttl, format="turtle"))
+    return conforms, report
+
+
+PREFIXES = """@prefix ex: <https://example.org/measure#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+"""
+
+
+def test_binding_shapes_report_exactly_what_the_binding_drops(binding):
+    from rdflib import Namespace, URIRef
+
+    SH = Namespace("http://www.w3.org/ns/shacl#")
+    data = PREFIXES + """<https://example.org/m1> a ex:Measurement, ex:SomethingElse ;
+        ex:title "t" ; ex:count 3 ; ex:unmapped "dropped" ."""
+    conforms, report = _validate(binding.binding_shapes(), data)
+    results = list(report.subjects(SH.resultSeverity, SH.Info))
+    assert not conforms and len(results) == 1, "one triple dropped; rdf:type ignored"
+    assert report.value(results[0], SH.resultPath) == URIRef("https://example.org/measure#unmapped")
+    assert not list(report.subjects(SH.resultSeverity, SH.Violation))
+
+
+def test_same_as_adds_a_field_and_a_term(tmp_path):
+    conf = (FIXTURES / "measure.binding.yaml").read_text() + "same_as: true\n"
+    (tmp_path / "b.yaml").write_text(conf.replace("schema: measure.yaml", f"schema: {FIXTURES / 'measure.yaml'}"))
+    b = Binding(tmp_path / "b.yaml")
+    props = b.lexicon("Measurement")["defs"]["main"]["record"]["properties"]
+    assert props["sameAs"]["items"] == {"type": "string", "format": "uri"}
+    ctx = b.context()["@context"]
+    assert ctx["sameAs"] == {"@id": "owl:sameAs", "@type": "@id", "@container": "@set"}
+    assert ctx["owl"] == "http://www.w3.org/2002/07/owl#"
+    assert "sh:path owl:sameAs" in b.binding_shapes(), "sameAs is not dropped"
+
+
+def test_pinning_warning_ignores_same_as_to_other_iris(binding):
+    shapes = binding.pinning_shapes()
+    # A target converted from elsewhere: owl:sameAs to its source IRI, not to an at:// URI.
+    converted = PREFIXES + """<https://example.org/m1> a ex:Measurement ; ex:notes <https://lod.example/at/x#it> .
+        <https://lod.example/at/x#it> owl:sameAs <https://dg.example/api/data/1> ."""
+    assert _validate(shapes, converted)[0]
+    unpinned = converted + "\n<https://lod.example/at/x#it> owl:sameAs <at://did:plc:x/org.example.measurement/1> ."
+    assert not _validate(shapes, unpinned)[0]

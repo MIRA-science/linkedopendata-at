@@ -11,6 +11,13 @@ export const config = {
   did: process.env.DEMO_DID ?? "did:web:mira-demo.local",
   password: process.env.DEMO_PASSWORD ?? "mira",
   contextPath: process.env.MIRA_CONTEXT ?? new URL("../schema/atproto/context.jsonld", root).pathname,
+  // Write path (broker/ingest.ts): the MIRA shapes and ontology, and the directory of the
+  // generated binding (lexicons, binding and pinning shapes).
+  shapesPath: process.env.MIRA_SHAPES ?? new URL("../schema/mira.shacl", root).pathname,
+  ontologyPath: process.env.MIRA_ONTOLOGY ?? new URL("../schema/mira.ttl", root).pathname,
+  bindingDir: process.env.MIRA_BINDING ?? new URL("../schema/atproto/", root).pathname,
+  // Hosts remote contexts of submitted JSON-LD may come from (besides HTTP_HOSTS).
+  contextHosts: (process.env.CONTEXT_HOSTS ?? "purl.org").split(",").filter(Boolean),
   // ‹lod-base› (the redirector) and the canonical broker endpoint.
   lodBase: process.env.LOD_BASE ?? `http://${host}:8080`,
   endpoint: process.env.BROKER ?? `http://${host}:8081`,

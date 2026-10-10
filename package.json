@@ -8,12 +8,14 @@
     "test": "npm --prefix normalizer test && node --test \"demo/**/*.test.ts\""
   },
   "dependencies": {
-    "jsonld": "^8.3.3"
+    "@atproto/lexicon": "^0.7.16",
+    "@zazuko/env": "^2.5.3",
+    "htmlparser2": "^12.0.0",
+    "jsonld": "^8.3.3",
+    "n3": "^1.26.0",
+    "rdf-validate-shacl": "^0.6.5"
   },
   "devDependencies": {
-    "@zazuko/env": "^2.5.3",
-    "n3": "^1.26.0",
-    "rdf-validate-shacl": "^0.6.5",
     "rdfa-streaming-parser": "^3.0.2"
   }
 }

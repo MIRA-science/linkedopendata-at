@@ -8,8 +8,16 @@ import { Broker, esc, SIOC_CONTENT, type Doc, type Links, type Loaded, type Node
 // NSID prefixes this broker serves, with the repo holding their context record (§4.1).
 // Stands in for _lexicon.‹authority› DNS resolution.
 const authorities: Record<string, { did: string }> = { "science.mira": { did: config.did } };
-// Stands in for DID resolution.
-export const pdsOf = (did: string) => (did === config.did ? config.pds : undefined);
+// Stands in for DID resolution: every account of the sandbox is on one PDS.
+export const pdsOf = (_did: string) => config.pds;
+const hostedRepos = new Set<string>();
+/** Whether the PDS holds a repo for this DID: the accounts this broker serves. */
+export async function hosted(did: string): Promise<boolean> {
+  if (hostedRepos.has(did)) return true;
+  if (!(await xrpc(did, "com.atproto.repo.describeRepo", { repo: did }))) return false;
+  hostedRepos.add(did);
+  return true;
+}
 export const authorityOf = (nsid: string) => Object.keys(authorities).find((p) => nsid.startsWith(p + "."));
 
 const communityContext = JSON.parse(readFileSync(new URL("../contexts/linkedopendata.context.jsonld", import.meta.url), "utf8"));
@@ -132,8 +140,8 @@ export class AtprotoBroker extends Broker {
 
   /** Account document (§6.1, §6.3): about the DID itself, which stays the account's IRI. */
   async resolveAccount(path: string, did: string): Promise<Result> {
-    if (!pdsOf(did)) return { status: 404 }; // only accounts whose repo this broker serves
     const info = await xrpc(did, "com.atproto.repo.describeRepo", { repo: did });
+    if (!info) return { status: 404 }; // only accounts whose repo this broker serves
     // Handles change and need DNS verification: shown only when verified.
     const handle = info?.handleIsCorrect ? (info.handle as string) : undefined;
     const repo = entityIri(this.lodBase, `at://${did}`);
@@ -158,7 +166,7 @@ export class AtprotoBroker extends Broker {
     if (!m) return { status: 404 };
     const [, did, nsid, rkey, cid] = m.map((x) => x && decodeURIComponent(x));
     const docUrl = this.brokerUrl(path);
-    if (!pdsOf(did)) return { status: 404 };
+    if (!(await hosted(did))) return { status: 404 };
 
     if (!nsid) {
       // Repo (§6.1).

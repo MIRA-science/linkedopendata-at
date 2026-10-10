@@ -17,6 +17,7 @@ packages = ["src/lod_at_gen"]
 
 [dependency-groups]
 dev = [
+    "pyshacl>=0.40.1",
     "pytest>=9.1.1",
     "rdflib>=7.6.0",
 ]
